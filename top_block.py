@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Top Block
-# Generated: Mon Feb 12 21:23:19 2018
+# Generated: Sun Mar 18 20:13:04 2018
 ##################################################
 
 if __name__ == '__main__':
@@ -16,7 +16,12 @@ if __name__ == '__main__':
         except:
             print "Warning: failed to XInitThreads()"
 
+import os
+import sys
+sys.path.append(os.environ.get('GRC_HIER_PATH', os.path.expanduser('~/.grc_gnuradio')))
+
 from PyQt4 import Qt
+from asc2sym_bf import asc2sym_bf  # grc-generated hier_block
 from gnuradio import blocks
 from gnuradio import eng_notation
 from gnuradio import gr
@@ -24,9 +29,7 @@ from gnuradio import qtgui
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from optparse import OptionParser
-import pmt
 import sip
-import sys
 from gnuradio import qtgui
 
 
@@ -59,7 +62,6 @@ class top_block(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.tag = tag = gr.tag_utils.python_to_tag((0, pmt.intern("H"), pmt.intern("0x48"), pmt.intern("Vsrc")))
         self.samp_rate = samp_rate = 32000
 
         ##################################################
@@ -112,30 +114,27 @@ class top_block(gr.top_block, Qt.QWidget):
 
         self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_char*1, samp_rate,True)
-        self.blocks_packed_to_unpacked_xx_0 = blocks.packed_to_unpacked_bb(1, gr.GR_LSB_FIRST)
-        self.blocks_char_to_float_0 = blocks.char_to_float(1, 1)
-        self.Vsrc = blocks.vector_source_b([ord(i) for i in 'HiQ '], True, 1, [tag])
+        self.blocks_vector_source_x_0 = blocks.vector_source_b(list(ord(i) for i in 'Hey!'), True, 1, [])
+        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
+        self.asc2sym_bf_0 = asc2sym_bf(
+            a_bpsym=1,
+            b_eds=1,
+            c_pol=1,
+            d_inv=1,
+            e_true_asci=0,
+        )
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.Vsrc, 0), (self.blocks_packed_to_unpacked_xx_0, 0))
-        self.connect((self.blocks_char_to_float_0, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.blocks_packed_to_unpacked_xx_0, 0), (self.blocks_throttle_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.blocks_char_to_float_0, 0))
+        self.connect((self.asc2sym_bf_0, 0), (self.blocks_throttle_0, 0))
+        self.connect((self.blocks_throttle_0, 0), (self.qtgui_time_sink_x_0, 0))
+        self.connect((self.blocks_vector_source_x_0, 0), (self.asc2sym_bf_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "top_block")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
-
-    def get_tag(self):
-        return self.tag
-
-    def set_tag(self, tag):
-        self.tag = tag
-        self.Vsrc.set_data([ord(i) for i in 'HiQ '], [self.tag])
 
     def get_samp_rate(self):
         return self.samp_rate
